@@ -1,15 +1,15 @@
 import express from 'express';
 import {nanoid} from 'nanoid';
-import {geoLookup}  from '../utils/geoIp' // Assuming you have a utility function for geolocation lookup
+import {geoLookup}  from '../utils/geoIp' 
 import {PrismaClient} from '@prisma/client';
 import {authMiddleware} from '../middleware/authMiddleware';
 import {urlSchema} from '../utils/validation';
-
+import {AuthRequest} from '../types/auth-request';
 
 const prisma = new PrismaClient();
 const router = express.Router();
 
-router.post("/shorten", authMiddleware, async (req, res) => {
+router.post("/shorten", authMiddleware, async (req:AuthRequest, res) => {
     const result = urlSchema.safeParse(req.body);
     if (!result.success) return res.status(400).json(result.error.format());
   
@@ -24,7 +24,7 @@ router.post("/shorten", authMiddleware, async (req, res) => {
         shortCode,
         original: longUrl,
         custom: !!customCode,
-        userId: req.user!.userId
+        userId: req.user?.userId
       }
     });
   
