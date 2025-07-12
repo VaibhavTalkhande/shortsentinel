@@ -1,6 +1,5 @@
 import { useState } from "react";
 import API from "../utils/axios";
-import { setToken } from "../utils/auth";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 type Props = { type: "login" | "register" };
