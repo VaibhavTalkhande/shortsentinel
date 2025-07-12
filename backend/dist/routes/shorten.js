@@ -45,16 +45,19 @@ router.get("/:code", (req, res) => __awaiter(void 0, void 0, void 0, function* (
     const url = yield prisma.url.findUnique({ where: { shortCode: code } });
     if (!url)
         return res.status(404).send("Not found");
-    const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-    const ua = req.headers["user-agent"] || "";
-    const geo = yield (0, geoIp_1.geoLookup)((ip === null || ip === void 0 ? void 0 : ip.toString()) || "0.0.0.0");
+    const ip = (req.headers["x-forwarded-for"] || req.socket.remoteAddress || "");
+    const geo = yield (0, geoIp_1.geoLookup)(ip);
     yield prisma.click.create({
         data: {
-            urlId: url.id,
-            ip: (ip === null || ip === void 0 ? void 0 : ip.toString()) || "unknown",
-            userAgent: ua,
-            location: (geo === null || geo === void 0 ? void 0 : geo.city) || "unknown"
-        }
+            ip,
+            city: geo === null || geo === void 0 ? void 0 : geo.city,
+            region: geo === null || geo === void 0 ? void 0 : geo.region,
+            country: geo === null || geo === void 0 ? void 0 : geo.country,
+            org: geo === null || geo === void 0 ? void 0 : geo.org,
+            loc: geo === null || geo === void 0 ? void 0 : geo.loc,
+            userAgent: req.headers["user-agent"] || "",
+            urlId: url.id
+        },
     });
     res.redirect(url.original);
 }));

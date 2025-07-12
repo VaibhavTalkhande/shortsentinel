@@ -12,6 +12,7 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const shorten_1 = __importDefault(require("./routes/shorten"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const client_1 = require("@prisma/client");
+const analytics_1 = __importDefault(require("./routes/analytics"));
 const prisma = new client_1.PrismaClient();
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -26,6 +27,7 @@ app.use((0, helmet_1.default)());
 app.use(express_1.default.json());
 app.use("/", shorten_1.default);
 app.use("/api", auth_1.default);
+app.use("/analytics", analytics_1.default);
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

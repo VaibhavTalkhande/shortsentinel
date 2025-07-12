@@ -35,11 +35,16 @@ model Url {
 }
 
 model Click {
-  id        String   @id @default(cuid())
-  url       Url      @relation(fields: [urlId], references: [id])
-  urlId     String
-  ip        String
-  userAgent String
-  location  String
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  ip         String
+  city       String?
+  region     String?
+  country    String?
+  org        String?
+  loc        String? // "latitude,longitude"
+  userAgent  String?
+  createdAt  DateTime @default(now())
+  
+  url        Url      @relation(fields: [urlId], references: [id])
+  urlId      String
 }

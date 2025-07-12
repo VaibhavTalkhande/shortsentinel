@@ -36,18 +36,32 @@ router.post("/shorten", authMiddleware, async (req:AuthRequest, res) => {
     const url = await prisma.url.findUnique({ where: { shortCode: code } });
     if (!url) return res.status(404).send("Not found");
   
-    const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-    const ua = req.headers["user-agent"] || "";
-    const geo = await geoLookup(ip?.toString() || "0.0.0.0");
+    const ip = (req.headers["x-forwarded-for"] || req.socket.remoteAddress || "") as string;
+    const geo = await geoLookup(ip);
   
     await prisma.click.create({
       data: {
-        urlId: url.id,
-        ip: ip?.toString() || "unknown",
-        userAgent: ua,
-        location: geo?.city || "unknown"
-      }
+        ip,
+        city: geo?.city,
+        region: geo?.region,
+        country: geo?.country,
+        org: geo?.org,
+        loc: geo?.loc,
+        userAgent: req.headers["user-agent"] || "",
+        urlId: url.id
+      },
     });
+  const io = req.app.get("io");
+  io.emit("click", {
+    shortCode: url.shortCode,
+    timestamp: new Date(),
+    geo: {
+      city: geo?.city,
+      country: geo?.country,
+      org: geo?.org,
+    },
+    userAgent: req.headers["user-agent"] || "",
+  });
   
     res.redirect(url.original);
   });
