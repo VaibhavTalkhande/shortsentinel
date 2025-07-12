@@ -1,11 +1,21 @@
 const IPINFO_TOKEN = process.env.IPINFO_TOKEN || "";
 const cache = new Map<string, any>();
 
-export const geoLookup = async (ip: string) => {
+// Normalize IP address
+const normalizeIp = (rawIp: string | undefined): string => {
+  if (!rawIp) return "127.0.0.1";
+  if (rawIp.includes(",")) return rawIp.split(",")[0].trim(); // Handle multi IPs from proxies
+  return rawIp;
+};
+
+export const geoLookup = async (rawIp: string) => {
   try {
-    if (cache.has(ip)) return cache.get(ip);
+    const ip = normalizeIp(rawIp);
+
+    // Skip GeoIP lookup for local dev
     if (ip === "::1" || ip === "127.0.0.1") {
       return {
+        ip,
         city: "Localhost",
         region: "Development",
         country: "Local",
@@ -14,12 +24,13 @@ export const geoLookup = async (ip: string) => {
       };
     }
 
+    if (cache.has(ip)) return cache.get(ip);
+
     const res = await fetch(`https://ipinfo.io/${ip}?token=${IPINFO_TOKEN}`);
     if (!res.ok) throw new Error("Geo API failed");
-    
+
     const data = await res.json();
-    cache.set(ip, data);
-    return {
+    const result = {
       ip: data.ip,
       city: data.city,
       region: data.region,
@@ -27,8 +38,19 @@ export const geoLookup = async (ip: string) => {
       org: data.org,
       loc: data.loc
     };
-  } catch (err ) {
-    console.error(`Geo lookup failed for IP ${ip}:`, (err as any).message);
-    return null;
+
+    cache.set(ip, result);
+    return result;
+
+  } catch (err) {
+    console.error(`Geo lookup failed for IP ${rawIp}:`, (err as any).message);
+    return {
+      ip: rawIp,
+      city: "Unknown",
+      region: "Unknown",
+      country: "Unknown",
+      org: "Unknown",
+      loc: "0,0"
+    };
   }
 };

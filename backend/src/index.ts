@@ -20,7 +20,7 @@ const io = new Server(server,{
         origin:"*",
     }
 })
-
+app.set("trust proxy", true);
 app.set("io", io);
 app.use(cors());
 app.use(helmet());
