@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const nanoid_1 = require("nanoid");
-const geoIp_1 = require("../utils/geoIp"); // Assuming you have a utility function for geolocation lookup
+const geoIp_1 = require("../utils/geoIp");
 const client_1 = require("@prisma/client");
 const authMiddleware_1 = require("../middleware/authMiddleware");
 const validation_1 = require("../utils/validation");

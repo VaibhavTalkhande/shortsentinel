@@ -12,7 +12,6 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const shorten_1 = __importDefault(require("./routes/shorten"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const client_1 = require("@prisma/client");
-require("./types/express");
 const prisma = new client_1.PrismaClient();
 dotenv_1.default.config();
 const app = (0, express_1.default)();
