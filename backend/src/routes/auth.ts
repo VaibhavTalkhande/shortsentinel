@@ -1,7 +1,7 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import { registerSchema, loginSchema } from "../utils/validation";
-import { hashPassword, comparePassword, generateToken } from "../utils/auth";
+import { hashPassword, comparePassword, generateToken, verifyToken } from "../utils/auth";
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -42,6 +42,21 @@ router.post("/login", async (req, res) => {
 
   const token = generateToken(user.id);
   return res.status(200).json({ token });
+});
+
+router.get("/me", async (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) return res.status(401).json({ message: "Unauthorized" });
+
+  try {
+    const userId = verifyToken(token);
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    return res.json({ id: user.id, email: user.email });
+  } catch (error) {
+    return res.status(401).json({ message: "Invalid token" });
+  }
 });
 
 export default router;
