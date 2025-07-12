@@ -97,6 +97,7 @@ function AnalyticsTable({ onSelect }: AnalyticsTableProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -138,9 +139,71 @@ function AnalyticsTable({ onSelect }: AnalyticsTableProps) {
     }
   };
 
+  const downloadCSV = async () => {
+    setDownloading("csv");
+    try {
+      const response = await API.get("/api/analytics/exports", {
+        responseType: "blob",
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "analytics.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Failed to download CSV:", err);
+    } finally {
+      setDownloading(null);
+    }
+  };
+
+  const downloadExcel = async () => {
+    setDownloading("excel");
+    try {
+      const response = await API.get("/api/analytics/export-excel", {
+        responseType: "blob",
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "analytics.xlsx");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Failed to download Excel:", err);
+    } finally {
+      setDownloading(null);
+    }
+  };
+
   return (
     <div className="bg-white rounded shadow p-6 mb-6">
-      <h2 className="text-lg font-semibold mb-2">Your Shortened URLs</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-semibold">Your Shortened URLs</h2>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={downloadCSV}
+            disabled={downloading !== null}
+            className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition disabled:opacity-50"
+          >
+            {downloading === "csv" ? "Downloading..." : "Download CSV"}
+          </button>
+          <button
+            type="button"
+            onClick={downloadExcel}
+            disabled={downloading !== null}
+            className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition disabled:opacity-50"
+          >
+            {downloading === "excel" ? "Downloading..." : "Download Excel"}
+          </button>
+        </div>
+      </div>
       {loading && <div className="text-blue-600">Loading...</div>}
       {error && <div className="text-red-500">{error}</div>}
       <div className="overflow-x-auto">
