@@ -4,7 +4,12 @@ import { Server } from "socket.io";
 import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
-import shortenRoutes, { handleRedirect } from "./routes/shorten";
+import shortenRoutes from "./routes/shorten";
+import authRoutes from "./routes/auth";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient()
+
 
 dotenv.config();
 
@@ -19,8 +24,8 @@ const io = new Server(server,{
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
-app.use("/api", shortenRoutes); 
-app.use("/:shortId",handleRedirect);
+app.use("/", shortenRoutes); 
+app.use("/api/auth", authRoutes);
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
