@@ -9,8 +9,6 @@ A secure, full-stack URL shortener platform with built-in live analytics, geo-lo
 - **Frontend URL:** https://shortsentinel-1.onrender.com
 - **Backend URL:** https://shortsentinel.onrender.com
 
-*(Update these URLs as needed for your deployment environment.)*
-
 ---
 
 ## ✨ Features
