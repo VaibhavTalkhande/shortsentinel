@@ -23,7 +23,7 @@ export default function AuthForm({ type }: Props) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-300">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-950 to-gray-900 text-green-800">
       <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
         <form onSubmit={handleSubmit} className="space-y-6">
           <h2 className="text-2xl font-bold text-center capitalize text-blue-700 mb-4">
